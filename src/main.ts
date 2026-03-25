@@ -16,7 +16,7 @@ async function bootstrap() {
 
   // Configuration du document Swagger
   const config = new DocumentBuilder()
-    .setTitle('WOM OMS')
+    .setTitle('OMS Project (coucou Francesco)')
     .setDescription('Order Management System avec moteur de workflow')
     .setVersion('1.0')
     // Ajoute le support du Bearer token JWT dans l'UI Swagger
