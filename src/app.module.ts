@@ -2,6 +2,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     // EventEmitterModule permet d'émettre et d'écouter des événements métier
     // (user.registered, order.created, etc.) de façon découplée
     EventEmitterModule.forRoot(),
+    PrismaModule,
   ],
 })
 export class AppModule {}
