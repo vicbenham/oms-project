@@ -8,6 +8,7 @@ import { OrdersModule } from './orders/orders.module';
 import { WorkflowsModule } from './workflows/workflows.module';
 import { EngineModule } from './engine/engine.module';
 import { ExecutionsController } from './executions/executions.controller';
+import { ExecutionsModule } from './executions/executions.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ExecutionsController } from './executions/executions.controller';
     OrdersModule,
     WorkflowsModule,
     EngineModule,
+    ExecutionsModule,
   ],
   controllers: [ExecutionsController],
 })

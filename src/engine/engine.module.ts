@@ -26,5 +26,6 @@ import { WorkflowsModule } from '../workflows/workflows.module';
     CreateTaskHandler,
     UpdateStatusHandler,
   ],
+  exports: [ExecutionRepository],
 })
 export class EngineModule {}
