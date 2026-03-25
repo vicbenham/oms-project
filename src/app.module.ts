@@ -6,6 +6,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
 import { WorkflowsModule } from './workflows/workflows.module';
+import { EngineModule } from './engine/engine.module';
+import { ExecutionsController } from './executions/executions.controller';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { WorkflowsModule } from './workflows/workflows.module';
     AuthModule,
     OrdersModule,
     WorkflowsModule,
+    EngineModule,
   ],
+  controllers: [ExecutionsController],
 })
 export class AppModule {}
