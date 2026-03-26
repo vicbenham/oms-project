@@ -88,11 +88,10 @@ model WorkflowExecution {
   status     ExecutionStatus
   startedAt  DateTime        @default(now())
   finishedAt DateTime?
-
-  context Json?
+  context    Json?
 
   workflowId String
-  workflow   Workflow @relation(fields: [workflowId], references: [id])
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
 
   actionResults ActionResult[]
 
