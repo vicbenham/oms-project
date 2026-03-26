@@ -57,8 +57,6 @@ model Workflow {
   trigger  TriggerType
   isActive Boolean     @default(true)
 
-  // US15 — condition optionnelle (ex: "amount > 100")
-  // Stockée sous forme JSON pour rester flexible
   condition Json?
 
   createdAt DateTime @default(now())

@@ -1,5 +1,11 @@
-// Contexte de l'événement transmis à chaque action
-// Contient toutes les données disponibles au moment du déclenchement
+/***
+ Définition du contexte de l'evenement que l'on transmet a chaque action
+ Le contexte doit contenir toutes les données disponible au moment du déclenchement
+  d'un event
+
+ On ajoute un dernier champ [key: string] de type unknown pour pouvoir étendre
+  le contexte à n'importe quel ajout qui n'aurait pas été précedemment établi
+ ***/
 export interface EventContext {
   userId?: string;
   orderId?: string;
@@ -7,11 +13,15 @@ export interface EventContext {
   status?: string;
   email?: string;
   workflowId?: string;
-  [key: string]: unknown; // permet d'étendre le contexte sans casser le typage
+  [key: string]: unknown;
 }
 
-// Interface Strategy — chaque handler implémente cette interface
-// Le moteur ne connaît que cette interface, pas les implémentations concrètes
+/***
+ C'est l'interface de notre pattern Strategy pour nos ActionHandlers.
+ On ne donne au moteur que cette interface pour qu'il reste agnostique des implémentations
+  concrètes des handlers.
+ La fonction execute nous retourne un message de resultat
+ ***/
 export interface ActionHandler {
-  execute(context: EventContext): Promise<string>; // retourne un message de résultat
+  execute(context: EventContext): Promise<string>;
 }

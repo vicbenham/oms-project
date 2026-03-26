@@ -7,12 +7,16 @@ import { CreateLogHandler } from './handlers/create-log.handler';
 import { CreateTaskHandler } from './handlers/create-task.handler';
 import { UpdateStatusHandler } from './handlers/update-status.handler';
 
-// Pattern Factory — centralise la création des handlers
-// Le moteur demande un handler par type d'action sans connaître les implémentations
-// Pour ajouter un nouveau type d'action : créer le handler + l'enregistrer ici
+/***
+ C'est la classe de notre pattern Factory pour centraliser la création de nos handlers.
+ On simplifie la création d'un nouveau type d'action en créant le handler et en
+  l'enregistrant ici (tout est centralisé).
+
+ Le map associe un type d'action a son handler correspondant, puis on enregistre
+  tous les handlers disponibles.
+ ***/
 @Injectable()
 export class ActionHandlerFactory {
-  // Map qui associe chaque ActionType à son handler concret
   private readonly handlers: Map<ActionType, ActionHandler>;
 
   constructor(
@@ -22,7 +26,6 @@ export class ActionHandlerFactory {
     private readonly createTaskHandler: CreateTaskHandler,
     private readonly updateStatusHandler: UpdateStatusHandler,
   ) {
-    // Enregistrement de tous les handlers disponibles
     this.handlers = new Map<ActionType, ActionHandler>([
       [ActionType.NOTIFY_ADMIN, this.notifyAdminHandler],
       [ActionType.NOTIFY_USER, this.notifyUserHandler],
@@ -32,8 +35,10 @@ export class ActionHandlerFactory {
     ]);
   }
 
-  // Retourne le handler correspondant au type d'action
-  // Lève une erreur si le type n'est pas enregistré
+  /***
+   On retourne le handler qui correspond au type d'action passé.
+   Si le handler n'est pas créé, on pète une erreur.
+   ***/
   getHandler(type: ActionType): ActionHandler {
     const handler = this.handlers.get(type);
     if (!handler) {

@@ -6,6 +6,19 @@ import { TriggerType, Prisma } from '@prisma/client';
 export class WorkflowRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  /***
+   C'est la couche d'abstraction entre la logique métier et la db (pattern Repository)
+
+   On centralise toutes les opérations CRUD sur les workflows et leurs actions en
+    garantissant que les services n'utilisent jamais Prisma directement
+
+   Le repo assure l'isolation des données par utilisateur.
+
+   On expose aussi une méthode dédiée a l'engine de workflow (findActiveByTrigger)
+    pour trouver les workflows actifs à partir d'un trigger spécifié.
+
+   Les casts c'est juste parce que Prisma faisait de la resistance.
+   ***/
   async create(
     userId: string,
     data: {

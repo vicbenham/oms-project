@@ -21,7 +21,7 @@ export class EngineService {
     private readonly actionHandlerFactory: ActionHandlerFactory,
   ) {}
 
-  // ─── Listeners d'événements (Pattern Observer) ───────────────────────────
+  // Listeners d'events (Pattern Observer)
 
   @OnEvent('user.registered')
   async onUserRegistered(context: actionHandlerInterface.EventContext) {
@@ -43,15 +43,17 @@ export class EngineService {
     await this.processEvent(TriggerType.MANUAL, context);
   }
 
-  // ─── Logique principale du moteur ────────────────────────────────────────
-
+  /***
+   On log explicitement le trigger déclenché puis on récupère tous les workflows
+   actifs pour ce trigger. (Si on a rien, on quitte)
+   Pour chaque workflow correspondant, on les exécute en parallèle.
+   ***/
   private async processEvent(
     trigger: TriggerType,
     context: actionHandlerInterface.EventContext,
   ) {
     this.logger.log(`Processing event for trigger: ${trigger}`);
 
-    // 1. Récupère tous les workflows actifs pour ce trigger
     const workflows =
       await this.workflowRepository.findActiveByTrigger(trigger);
 
@@ -60,48 +62,48 @@ export class EngineService {
       return;
     }
 
-    // 2. Exécute chaque workflow correspondant en parallèle
     await Promise.all(
       workflows.map((workflow) => this.executeWorkflow(workflow, context)),
     );
   }
 
+  /***
+   Avant l'exec du workflow, on check les conditions.
+   On créé un log des executions en base pour l'observabilité.
+
+   On éxécute les actions du workflow de façon séquentielle (Chain of Responsibility)
+     et ce même si on a un échec sur l'une d'entre elles.
+
+   On récupère le handler de l'action en cours (Pattern Strategy), on execute et
+     on enregistre en base le resultat
+
+   On retourne un status (SUCCESS ou FAILED) si une erreur d'exec est détectée
+   ***/
   private async executeWorkflow(
     workflow: any,
     context: actionHandlerInterface.EventContext,
   ) {
-    // US15 — Évalue la condition avant d'exécuter le workflow
-    if (
-      workflow.condition &&
-      !this.evaluateCondition(workflow.condition, context)
+    if (workflow.condition && !this.evaluateCondition(workflow.condition, context)
     ) {
-      this.logger.log(
-        `Workflow "${workflow.name}" skipped — condition not met`,
-      );
+      this.logger.log(`Workflow "${workflow.name}" skipped — condition not met`,);
       return;
     }
 
     this.logger.log(`Executing workflow: "${workflow.name}" (${workflow.id})`);
 
-    // Crée l'enregistrement d'exécution en base (observabilité US12)
     const execution = await this.executionRepository.createExecution(
       workflow.id,
       context,
     );
 
     let hasError = false;
-
-    // Pattern Chain of Responsibility — exécution séquentielle des actions
-    // Chaque action est exécutée dans l'ordre défini, même si une échoue
     for (const action of workflow.actions) {
       try {
         const handler = this.actionHandlerFactory.getHandler(
-          action.type as ActionType,
-        );
+          action.type as ActionType);
 
         const output = await handler.execute(context);
 
-        // Enregistre le résultat de l'action (succès)
         await this.executionRepository.createActionResult({
           executionId: execution.id,
           actionType: action.type,
@@ -111,14 +113,9 @@ export class EngineService {
         });
       } catch (error) {
         hasError = true;
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error.message
+        this.logger.error(`Action ${action.type} failed in workflow "${workflow.name}": ${errorMessage}`);
 
-        this.logger.error(
-          `Action ${action.type} failed in workflow "${workflow.name}": ${errorMessage}`,
-        );
-
-        // Enregistre le résultat de l'action (échec)
         await this.executionRepository.createActionResult({
           executionId: execution.id,
           actionType: action.type,
@@ -129,19 +126,20 @@ export class EngineService {
       }
     }
 
-    // Finalise l'exécution avec le statut global
     const finalStatus = hasError
       ? ExecutionStatus.FAILED
       : ExecutionStatus.SUCCESS;
     await this.executionRepository.completeExecution(execution.id, finalStatus);
 
-    this.logger.log(
-      `Workflow "${workflow.name}" completed with status: ${finalStatus}`,
-    );
+    this.logger.log(`Workflow "${workflow.name}" completed with status: ${finalStatus}`);
   }
 
-  // US15 — Évalue une condition simple sur le contexte de l'événement
-  // Format attendu: { field: "amount", operator: ">", value: 100 }
+  /***
+   On check que les conditions pour l'event en fonction des infos de son contexte
+    sont valides.
+
+   On retourne true ou false en fonction du passage de la validation ou non.
+   ***/
   private evaluateCondition(
     condition: Record<string, unknown>,
     context: actionHandlerInterface.EventContext,
