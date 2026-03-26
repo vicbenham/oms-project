@@ -9,7 +9,6 @@ export class CreateTaskHandler implements ActionHandler {
   constructor(private readonly prisma: PrismaService) {}
 
   async execute(context: EventContext): Promise<string> {
-    // Crée une vraie tâche en base de données
     const task = await this.prisma.task.create({
       data: {
         title: `Task for order ${context.orderId ?? 'unknown'}`,

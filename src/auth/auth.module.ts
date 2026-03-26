@@ -17,7 +17,6 @@ import type { StringValue } from 'ms';
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
-          // Cast explicite vers StringValue pour satisfaire le typage de @nestjs/jwt
           expiresIn: config.getOrThrow<string>('JWT_EXPIRES_IN') as StringValue,
         },
       }),

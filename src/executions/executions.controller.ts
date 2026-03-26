@@ -10,8 +10,6 @@ import { ExecutionRepository } from '../engine/repositories/execution.repository
 export class ExecutionsController {
   constructor(private readonly executionRepository: ExecutionRepository) {}
 
-  // Récupère toutes les exécutions d'un workflow donné
-  // L'utilisateur ne peut consulter que ses propres workflows (US11)
   @Get('workflow/:workflowId')
   @ApiOperation({ summary: 'Historique des exécutions d\'un workflow' })
   findByWorkflow(@Param('workflowId') workflowId: string) {

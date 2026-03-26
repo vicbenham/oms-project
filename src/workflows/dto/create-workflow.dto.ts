@@ -16,8 +16,6 @@ export class CreateWorkflowDto {
   @IsBoolean()
   isActive?: boolean;
 
-  // US15 — condition optionnelle sous forme d'objet JSON
-  // Ex: { "field": "amount", "operator": ">", "value": 100 }
   @ApiPropertyOptional({
     example: { field: 'amount', operator: '>', value: 100 },
   })

@@ -12,7 +12,7 @@ export class AddActionDto {
   @IsPositive()
   order: number;
 
-  // Paramètres optionnels spécifiques à certaines actions
+  //paramètres optionnels spécifiques à certaines actions
   @ApiPropertyOptional({ example: { message: 'Votre commande a été créée' } })
   @IsOptional()
   params?: Record<string, unknown>;

@@ -7,14 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─────────────────────────────────────────────
-// USER
-// Un utilisateur possède des commandes et des workflows
-// ─────────────────────────────────────────────
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  password  String // stocké hashé via bcrypt (jamais en clair)
+  password  String
   createdAt DateTime @default(now())
 
   orders    Order[]
@@ -23,11 +19,6 @@ model User {
   @@map("users")
 }
 
-// ─────────────────────────────────────────────
-// ORDER
-// Une commande appartient à un utilisateur
-// Elle déclenche l'événement order.created
-// ─────────────────────────────────────────────
 model Order {
   id        String      @id @default(uuid())
   amount    Float
@@ -46,11 +37,6 @@ enum OrderStatus {
   CANCELLED
 }
 
-// ─────────────────────────────────────────────
-// WORKFLOW
-// Un workflow = un trigger + une liste d'actions ordonnées
-// Il appartient à un utilisateur et peut être actif/inactif
-// ─────────────────────────────────────────────
 model Workflow {
   id       String      @id @default(uuid())
   name     String
@@ -70,25 +56,18 @@ model Workflow {
   @@map("workflows")
 }
 
-// Les triggers disponibles dans le système
 enum TriggerType {
-  USER_REGISTERED // déclenché à l'inscription
-  ORDER_CREATED // déclenché à la création d'une commande
-  ORDER_PAID // déclenché quand une commande passe à PAID
-  MANUAL // déclenché manuellement via un endpoint
+  USER_REGISTERED
+  ORDER_CREATED
+  ORDER_PAID
+  MANUAL
 }
 
-// ─────────────────────────────────────────────
-// WORKFLOW ACTION
-// Une action appartient à un workflow
-// Elle a un type et un ordre d'exécution
-// Elle peut avoir des paramètres optionnels (ex: URL pour call_webhook)
-// ─────────────────────────────────────────────
 model WorkflowAction {
   id     String     @id @default(uuid())
   type   ActionType
-  order  Int // détermine l'ordre d'exécution séquentielle
-  params Json? // paramètres optionnels spécifiques à l'action
+  order  Int
+  params Json?
 
   workflowId String
   workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
@@ -96,28 +75,20 @@ model WorkflowAction {
   @@map("workflow_actions")
 }
 
-// Les types d'actions disponibles
 enum ActionType {
-  NOTIFY_ADMIN // notifie l'admin (log en base)
-  NOTIFY_USER // notifie l'utilisateur (log en base)
-  CREATE_LOG // crée une entrée de log
-  CREATE_TASK // crée une tâche en base
-  UPDATE_STATUS // met à jour le statut d'une commande
+  NOTIFY_ADMIN
+  NOTIFY_USER
+  CREATE_LOG
+  CREATE_TASK
+  UPDATE_STATUS
 }
 
-// ─────────────────────────────────────────────
-// WORKFLOW EXECUTION
-// Historique de chaque exécution d'un workflow
-// Permet l'observabilité (US12)
-// ─────────────────────────────────────────────
 model WorkflowExecution {
   id         String          @id @default(uuid())
   status     ExecutionStatus
   startedAt  DateTime        @default(now())
   finishedAt DateTime?
 
-  // Contexte de l'événement qui a déclenché l'exécution (sérialisé en JSON)
-  // Ex: { orderId: "...", amount: 150 }
   context Json?
 
   workflowId String
@@ -134,17 +105,12 @@ enum ExecutionStatus {
   FAILED
 }
 
-// ─────────────────────────────────────────────
-// ACTION RESULT
-// Résultat de chaque action dans une exécution
-// Permet de savoir exactement quelle action a réussi ou échoué
-// ─────────────────────────────────────────────
 model ActionResult {
   id         String       @id @default(uuid())
   actionType ActionType
   status     ResultStatus
-  order      Int // ordre dans lequel l'action a été exécutée
-  output     String? // message de succès ou d'erreur
+  order      Int
+  output     String?
   executedAt DateTime     @default(now())
 
   executionId String
@@ -158,10 +124,6 @@ enum ResultStatus {
   FAILED
 }
 
-// ─────────────────────────────────────────────
-// TASK
-// Créée par l'action CREATE_TASK
-// ─────────────────────────────────────────────
 model Task {
   id          String   @id @default(uuid())
   title       String

@@ -5,10 +5,9 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-// @ApiBearerAuth('JWT') indique à Swagger que ces routes nécessitent un token
 @ApiTags('Orders')
 @ApiBearerAuth('JWT')
-@UseGuards(JwtAuthGuard) // toutes les routes de ce controller sont protégées
+@UseGuards(JwtAuthGuard) // toutes routes protégées
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
@@ -17,7 +16,6 @@ export class OrdersController {
   @ApiOperation({ summary: 'Créer une commande' })
   @ApiResponse({ status: 201, description: 'Commande créée' })
   create(@Request() req, @Body() dto: CreateOrderDto) {
-    // req.user est injecté par JwtAuthGuard via la JwtStrategy
     return this.ordersService.create(req.user.id, dto);
   }
 

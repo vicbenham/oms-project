@@ -11,15 +11,12 @@ import { WorkflowsModule } from '../workflows/workflows.module';
 
 @Module({
   imports: [
-    // On importe WorkflowsModule pour accéder au WorkflowRepository
     WorkflowsModule,
   ],
   providers: [
     EngineService,
     ActionHandlerFactory,
     ExecutionRepository,
-    // Tous les handlers sont déclarés comme providers
-    // NestJS les injectera automatiquement dans la Factory
     NotifyAdminHandler,
     NotifyUserHandler,
     CreateLogHandler,

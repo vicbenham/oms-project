@@ -16,12 +16,11 @@ async function bootstrap() {
     }),
   );
 
-  // Configuration du document Swagger
+  // swagger conf
   const config = new DocumentBuilder()
     .setTitle('OMS Project (coucou Francesco)')
     .setDescription('Order Management System avec moteur de workflow')
     .setVersion('1.0')
-    // Ajoute le support du Bearer token JWT dans l'UI Swagger
     .addBearerAuth(
       {
         type: 'http',
@@ -29,7 +28,7 @@ async function bootstrap() {
         bearerFormat: 'JWT',
         description: 'Entre ton JWT ici',
       },
-      'JWT', // nom de la sécurité, référencé dans les décorateurs @ApiBearerAuth('JWT')
+      'JWT',
     )
     .build();
 

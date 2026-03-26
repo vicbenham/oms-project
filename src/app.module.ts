@@ -12,12 +12,7 @@ import { ExecutionsModule } from './executions/executions.module';
 
 @Module({
   imports: [
-    // Charge les variables d'environnement depuis .env globalement
-    // isGlobal: true → pas besoin de réimporter ConfigModule dans chaque module
     ConfigModule.forRoot({ isGlobal: true }),
-
-    // EventEmitterModule permet d'émettre et d'écouter des événements métier
-    // (user.registered, order.created, etc.) de façon découplée
     EventEmitterModule.forRoot(),
     PrismaModule,
     AuthModule,

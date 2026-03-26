@@ -57,7 +57,6 @@ export class WorkflowsService {
     return this.workflowRepository.removeAction(actionId);
   }
 
-  // Déclenche manuellement un workflow (US06 — manual.trigger)
   async triggerManually(workflowId: string, userId: string) {
     const workflow = await this.findOne(workflowId, userId);
     this.eventEmitter.emit('manual.trigger', {

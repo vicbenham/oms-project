@@ -15,9 +15,6 @@ export class OrdersService {
   async create(userId: string, dto: CreateOrderDto) {
     const order = await this.orderRepository.create(userId, dto.amount);
 
-    // Émet l'événement métier order.created
-    // Le workflow engine écoutera cet événement et déclenchera
-    // les workflows dont le trigger est ORDER_CREATED
     this.eventEmitter.emit('order.created', {
       orderId: order.id,
       userId: order.userId,
@@ -41,12 +38,10 @@ export class OrdersService {
   }
 
   async updateStatus(id: string, userId: string, dto: UpdateOrderStatusDto) {
-    // Vérifie que la commande appartient bien à l'utilisateur (US11)
     await this.findOne(id, userId);
 
     const updated = await this.orderRepository.updateStatus(id, dto.status);
 
-    // Émet l'événement order.paid si le statut passe à PAID
     if (dto.status === OrderStatus.PAID) {
       this.eventEmitter.emit('order.paid', {
         orderId: updated.id,

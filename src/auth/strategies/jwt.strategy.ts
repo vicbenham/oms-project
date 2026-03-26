@@ -13,7 +13,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      // Le ! dit à TypeScript "je garantis que cette valeur existe"
       secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
     });
   }
