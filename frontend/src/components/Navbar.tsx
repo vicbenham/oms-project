@@ -7,7 +7,7 @@ export function Navbar() {
 
   return (
     <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between shadow-lg">
-      <span className="font-bold text-lg tracking-wide text-pink-400">WOM OMS</span>
+      <span className="font-bold text-lg tracking-wide text-pink-400">OMS PROJECT</span>
       <div className="flex gap-6 items-center">
         {[
           { to: '/', label: 'Dashboard' },
